@@ -72,7 +72,20 @@ begin
  return jsonb_build_object('ok',true,'session_token',s,'patient_name',p.name);
 end $$;
 
+create or replace function public.validate_patient_session(p_token uuid)
+returns jsonb language plpgsql security definer set search_path=public as $$
+declare p_name text;
+begin
+ select p.name into p_name
+ from patient_sessions s join patients p on p.id=s.patient_id
+ where s.token=p_token and s.expires_at>now() and p.active=true
+ and (p.expires_at is null or p.expires_at>now()) limit 1;
+ if p_name is null then return jsonb_build_object('ok',false); end if;
+ return jsonb_build_object('ok',true,'patient_name',p_name);
+end $$;
+
 grant execute on function public.patient_login(text,text) to anon,authenticated;
+grant execute on function public.validate_patient_session(uuid) to anon,authenticated;
 grant execute on function public.create_patient_access(text,text,timestamptz) to authenticated;
 
 -- DESPUÉS de crear la usuaria lummina369@gmail.com en Authentication > Users,
