@@ -1,5 +1,5 @@
 window.LUMINA_CONFIG = {
-  SUPABASE_URL: "PEGAR_SUPABASE_URL",
-  SUPABASE_ANON_KEY: "PEGAR_SUPABASE_ANON_KEY",
+  SUPABASE_URL: "https://gwyzqpfeetlisxhgeiyq.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_I7PmmPW_W1iewtF-tGbLAw_mcJ-qif7",
   ADMIN_EMAIL: "lummina369@gmail.com"
 };
