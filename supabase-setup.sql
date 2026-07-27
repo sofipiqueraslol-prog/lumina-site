@@ -41,6 +41,20 @@ create or replace function public.is_lumina_admin()
 returns boolean language sql stable security definer set search_path=public
 as $$ select exists(select 1 from public.admins a where a.user_id=auth.uid() and lower(a.email)='lummina369@gmail.com') $$;
 
+create or replace function public.bootstrap_lumina_admin()
+returns jsonb language plpgsql security definer set search_path=public as $$
+declare v_email text;
+begin
+  select lower(email) into v_email from auth.users where id=auth.uid();
+  if auth.uid() is null or v_email <> 'lummina369@gmail.com' then
+    raise exception 'Correo no autorizado';
+  end if;
+  insert into public.admins(user_id,email)
+  values(auth.uid(),v_email)
+  on conflict (user_id) do update set email=excluded.email;
+  return jsonb_build_object('ok',true);
+end $$;
+
 drop policy if exists "admin patients" on public.patients;
 create policy "admin patients" on public.patients for all using(public.is_lumina_admin()) with check(public.is_lumina_admin());
 drop policy if exists "admin logs" on public.access_logs;
@@ -87,8 +101,4 @@ end $$;
 grant execute on function public.patient_login(text,text) to anon,authenticated;
 grant execute on function public.validate_patient_session(uuid) to anon,authenticated;
 grant execute on function public.create_patient_access(text,text,timestamptz) to authenticated;
-
--- DESPUÉS de crear la usuaria lummina369@gmail.com en Authentication > Users,
--- ejecutar reemplazando EL_UUID_DE_LA_USUARIA:
--- insert into public.admins(user_id,email)
--- values ('EL_UUID_DE_LA_USUARIA','lummina369@gmail.com');
+grant execute on function public.bootstrap_lumina_admin() to authenticated;
