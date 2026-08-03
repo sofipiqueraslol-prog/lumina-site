@@ -1,0 +1,1 @@
+Activar despliegue de la pantalla renovada para pacientes en Lumina Bienestar.
