@@ -1,0 +1,34 @@
+name: Generate LUMINA Day 3 fast
+
+on:
+  push:
+    paths:
+      - '.github/workflows/generate-lumina-day3-fast.yml'
+      - 'scripts/day3-fast-trigger.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Python dependencies
+        run: pip install edge-tts pillow
+      - name: Verify ffmpeg
+        run: ffmpeg -version | head -1
+      - name: Generate video
+        run: python scripts/generate_lumina_day3.py
+      - name: Output metadata
+        run: ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 LUMINA_Dia3_voz_natural.mp4
+      - name: Upload final video
+        uses: actions/upload-artifact@v4
+        with:
+          name: LUMINA_Dia3_voz_natural_fast
+          path: LUMINA_Dia3_voz_natural.mp4
+          retention-days: 7
