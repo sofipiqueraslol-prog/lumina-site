@@ -1,0 +1,30 @@
+name: Generate LUMINA Day 7 natural voice video
+on:
+  push:
+    paths:
+      - 'scripts/generate_lumina_day7.py'
+      - '.github/workflows/generate-lumina-day7.yml'
+  workflow_dispatch:
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install edge-tts pillow
+      - name: Generate video
+        run: python scripts/generate_lumina_day7.py
+      - name: Show output metadata
+        run: ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 LUMINA_Dia7_voz_natural.mp4
+      - name: Upload final video
+        uses: actions/upload-artifact@v4
+        with:
+          name: LUMINA_Dia7_voz_natural
+          path: LUMINA_Dia7_voz_natural.mp4
+          retention-days: 7
