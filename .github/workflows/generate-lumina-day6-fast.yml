@@ -1,0 +1,36 @@
+name: Generate LUMINA Day 6 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/generate-lumina-day6-fast.yml'
+      - 'scripts/generate_lumina_day6.py'
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Python dependencies
+        run: pip install edge-tts pillow
+      - name: Generate video
+        run: python scripts/generate_lumina_day6.py
+      - name: Show output metadata
+        run: ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 LUMINA_Dia6_voz_natural.mp4
+      - name: Upload final video
+        uses: actions/upload-artifact@v4
+        with:
+          name: LUMINA_Dia6_voz_natural_FAST
+          path: LUMINA_Dia6_voz_natural.mp4
+          if-no-files-found: error
+          retention-days: 7
