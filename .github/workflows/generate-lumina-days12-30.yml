@@ -39,3 +39,4 @@ jobs:
           name: LUMINA_Dias12_30_voz_natural
           path: LUMINA_Dia*_voz_natural.mp4
           retention-days: 7
+# PR trigger marker 2026-08-21
