@@ -4,17 +4,23 @@ on:
   push:
     paths:
       - 'scripts/generate_lumina_days12_30.py'
+      - 'scripts/generate_lumina_one_day.py'
       - '.github/workflows/generate-lumina-days12-30.yml'
   pull_request:
     paths:
       - 'scripts/generate_lumina_days12_30.py'
+      - 'scripts/generate_lumina_one_day.py'
       - '.github/workflows/generate-lumina-days12-30.yml'
   workflow_dispatch:
 
 jobs:
   generate:
+    strategy:
+      fail-fast: false
+      matrix:
+        day: [12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,18 +31,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-dejavu-core
           pip install pillow edge-tts
-      - name: Generate videos
-        run: python scripts/generate_lumina_days12_30.py
+      - name: Generate video
+        run: python scripts/generate_lumina_one_day.py ${{ matrix.day }}
       - name: Show output metadata
-        run: |
-          for f in LUMINA_Dia*_voz_natural.mp4; do
-            echo "=== $f ==="
-            ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 "$f"
-          done
-      - name: Upload all videos
+        run: ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 LUMINA_Dia${{ matrix.day }}_voz_natural.mp4
+      - name: Upload video
         uses: actions/upload-artifact@v4
         with:
-          name: LUMINA_Dias12_30_voz_natural
-          path: LUMINA_Dia*_voz_natural.mp4
+          name: LUMINA_Dia${{ matrix.day }}_voz_natural
+          path: LUMINA_Dia${{ matrix.day }}_voz_natural.mp4
           retention-days: 7
-# PR trigger marker 2026-08-21
