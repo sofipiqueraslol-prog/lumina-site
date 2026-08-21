@@ -5,6 +5,10 @@ on:
     paths:
       - 'scripts/generate_lumina_days12_30.py'
       - '.github/workflows/generate-lumina-days12-30.yml'
+  pull_request:
+    paths:
+      - 'scripts/generate_lumina_days12_30.py'
+      - '.github/workflows/generate-lumina-days12-30.yml'
   workflow_dispatch:
 
 jobs:
