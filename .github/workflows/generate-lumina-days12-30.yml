@@ -1,0 +1,37 @@
+name: Generate LUMINA Days 12-30 natural voice videos
+
+on:
+  push:
+    paths:
+      - 'scripts/generate_lumina_days12_30.py'
+      - '.github/workflows/generate-lumina-days12-30.yml'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          pip install pillow edge-tts
+      - name: Generate videos
+        run: python scripts/generate_lumina_days12_30.py
+      - name: Show output metadata
+        run: |
+          for f in LUMINA_Dia*_voz_natural.mp4; do
+            echo "=== $f ==="
+            ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 "$f"
+          done
+      - name: Upload all videos
+        uses: actions/upload-artifact@v4
+        with:
+          name: LUMINA_Dias12_30_voz_natural
+          path: LUMINA_Dia*_voz_natural.mp4
+          retention-days: 7
